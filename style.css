@@ -1,0 +1,405 @@
+:root {
+  --bg: #eef3f8;
+  --surface: #ffffff;
+  --surface-soft: #f7f9fc;
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --secondary: #dbeafe;
+  --text: #111827;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --success: #059669;
+  --danger: #dc2626;
+  --shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+  --radius-lg: 28px;
+  --radius-md: 18px;
+  --radius-sm: 12px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(circle at top left, #dbeafe 0, transparent 35%),
+    var(--bg);
+  color: var(--text);
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app {
+  width: 100%;
+  min-height: 100vh;
+  max-width: 430px;
+  margin: 0 auto;
+  background: var(--surface-soft);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.screen {
+  display: none;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.screen.active {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.brand-area {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  flex: 1;
+}
+
+.logo {
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 24px;
+  border-radius: 24px;
+  background: var(--primary);
+  color: #ffffff;
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 12px;
+  font-size: 2.6rem;
+  line-height: 1;
+}
+
+h2 {
+  margin-bottom: 0;
+  font-size: 1.7rem;
+}
+
+h3 {
+  margin-bottom: 0;
+  font-size: 1.1rem;
+}
+
+p {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.btn {
+  width: 100%;
+  border: 0;
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  font-weight: 700;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.btn:active,
+.option-button:active,
+.icon-button:active {
+  transform: scale(0.98);
+}
+
+.btn.primary {
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.25);
+}
+
+.btn.primary:hover {
+  background: var(--primary-dark);
+}
+
+.btn.secondary {
+  background: var(--secondary);
+  color: var(--primary-dark);
+}
+
+.screen-header,
+.dashboard-header,
+.simple-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.simple-header {
+  display: block;
+}
+
+.back-button,
+.icon-button {
+  border: 0;
+  background: var(--surface);
+  color: var(--text);
+  border-radius: 999px;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 14px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+.icon-button {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.form label {
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.form input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 15px;
+  background: var(--surface);
+  outline: none;
+}
+
+.form input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+.form-message {
+  min-height: 20px;
+  margin: 4px 0;
+  font-size: 0.9rem;
+  color: var(--danger);
+}
+
+.helper-text {
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.text-button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.eyebrow {
+  margin-bottom: 8px;
+  color: var(--primary);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.onboarding-card,
+.balance-card,
+.content-section {
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  background: var(--surface);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.option-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.option-button {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  background: var(--surface-soft);
+  color: var(--text);
+  text-align: left;
+  font-weight: 700;
+}
+
+.option-button.selected {
+  border-color: var(--primary);
+  background: var(--secondary);
+  color: var(--primary-dark);
+}
+
+.dashboard-screen.active {
+  justify-content: flex-start;
+}
+
+.dashboard-header {
+  justify-content: space-between;
+}
+
+.balance-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background:
+    linear-gradient(135deg, #2563eb, #1e40af);
+  color: #ffffff;
+}
+
+.balance-card p,
+.balance-card small {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.balance-card strong {
+  font-size: 2rem;
+}
+
+.content-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.muted-text {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.rate-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.rate-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-radius: var(--radius-md);
+  padding: 16px;
+  background: var(--surface-soft);
+}
+
+.rate-card span {
+  color: var(--primary);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.rate-card strong {
+  font-size: 1.2rem;
+}
+
+.rate-card small {
+  color: var(--muted);
+}
+
+.transaction-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+}
+
+.transaction-item:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.transaction-item div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.transaction-item small {
+  color: var(--muted);
+}
+
+.income {
+  color: var(--success);
+  font-weight: 800;
+}
+
+.expense {
+  color: var(--danger);
+  font-weight: 800;
+}
+
+@media (min-width: 768px) {
+  body {
+    display: grid;
+    place-items: center;
+    padding: 32px;
+  }
+
+  .app {
+    min-height: 860px;
+    border-radius: 36px;
+  }
+
+  .screen {
+    min-height: 860px;
+  }
+
+  .rate-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

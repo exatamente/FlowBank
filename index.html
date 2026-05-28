@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FlowBank</title>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app">
+
+    <!-- Tela de boas-vindas -->
+    <section id="welcome-screen" class="screen active">
+      <div class="brand-area">
+        <div class="logo">FB</div>
+
+        <h1>FlowBank</h1>
+        <p>
+          Seu banco digital simples, leve e feito para acompanhar seu fluxo.
+        </p>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" id="go-to-login">Entrar</button>
+        <button class="btn secondary" id="go-to-register">Criar conta</button>
+      </div>
+    </section>
+
+    <!-- Tela de login -->
+    <section id="login-screen" class="screen">
+      <header class="screen-header">
+        <button class="back-button" data-target="welcome-screen">←</button>
+        <h2>Entrar</h2>
+      </header>
+
+      <form class="form" id="login-form">
+        <label for="login-email">E-mail</label>
+        <input
+          type="email"
+          id="login-email"
+          placeholder="seuemail@exemplo.com"
+          required
+        />
+
+        <label for="login-password">Senha</label>
+        <input
+          type="password"
+          id="login-password"
+          placeholder="Digite sua senha"
+          required
+        />
+
+        <p class="form-message" id="login-message"></p>
+
+        <button class="btn primary" type="submit">Entrar</button>
+      </form>
+
+      <p class="helper-text">
+        Ainda não tem conta?
+        <button class="text-button" id="login-to-register">Criar conta</button>
+      </p>
+    </section>
+
+    <!-- Tela de cadastro -->
+    <section id="register-screen" class="screen">
+      <header class="screen-header">
+        <button class="back-button" data-target="welcome-screen">←</button>
+        <h2>Criar conta</h2>
+      </header>
+
+      <form class="form" id="register-form">
+        <label for="register-name">Nome</label>
+        <input
+          type="text"
+          id="register-name"
+          placeholder="Seu nome"
+          required
+        />
+
+        <label for="register-email">E-mail</label>
+        <input
+          type="email"
+          id="register-email"
+          placeholder="seuemail@exemplo.com"
+          required
+        />
+
+        <label for="register-password">Senha</label>
+        <input
+          type="password"
+          id="register-password"
+          placeholder="Crie uma senha"
+          required
+        />
+
+        <label for="register-confirm-password">Confirmar senha</label>
+        <input
+          type="password"
+          id="register-confirm-password"
+          placeholder="Repita a senha"
+          required
+        />
+
+        <p class="form-message" id="register-message"></p>
+
+        <button class="btn primary" type="submit">Criar conta</button>
+      </form>
+
+      <p class="helper-text">
+        Já tem conta?
+        <button class="text-button" id="register-to-login">Entrar</button>
+      </p>
+    </section>
+
+    <!-- Tela de onboarding -->
+    <section id="onboarding-screen" class="screen">
+      <header class="simple-header">
+        <p class="eyebrow">Primeiro acesso</p>
+        <h2>Vamos configurar sua conta</h2>
+      </header>
+
+      <div class="onboarding-card">
+        <p>Qual é seu principal objetivo com o FlowBank?</p>
+
+        <div class="option-list">
+          <button class="option-button selected" data-goal="Organizar gastos">
+            Organizar gastos
+          </button>
+
+          <button class="option-button" data-goal="Guardar dinheiro">
+            Guardar dinheiro
+          </button>
+
+          <button class="option-button" data-goal="Acompanhar movimentações">
+            Acompanhar movimentações
+          </button>
+        </div>
+      </div>
+
+      <button class="btn primary" id="finish-onboarding">
+        Começar
+      </button>
+    </section>
+
+    <!-- Tela principal / dashboard -->
+    <section id="dashboard-screen" class="screen dashboard-screen">
+      <header class="dashboard-header">
+        <div>
+          <p class="eyebrow">Bem-vindo</p>
+          <h2 id="dashboard-user-name">Olá, usuário</h2>
+        </div>
+
+        <button class="icon-button" id="logout-button" title="Sair">
+          sair
+        </button>
+      </header>
+
+      <section class="balance-card">
+        <p>Saldo disponível</p>
+        <strong id="balance-value">R$ 2.840,75</strong>
+        <small>Conta FlowBank • 0001</small>
+      </section>
+
+      <section class="content-section">
+        <div class="section-title">
+          <h3>Cotações</h3>
+          <button class="text-button" id="refresh-rates">Atualizar</button>
+        </div>
+
+        <div class="rate-grid" id="exchange-rates">
+          <article class="rate-card">
+            <span>USD</span>
+            <strong>R$ 5,00</strong>
+            <small>Dólar comercial</small>
+          </article>
+
+          <article class="rate-card">
+            <span>EUR</span>
+            <strong>R$ 5,40</strong>
+            <small>Euro comercial</small>
+          </article>
+
+          <article class="rate-card">
+            <span>BTC</span>
+            <strong>R$ 300.000,00</strong>
+            <small>Bitcoin</small>
+          </article>
+        </div>
+      </section>
+
+      <section class="content-section">
+        <div class="section-title">
+          <h3>Últimos lançamentos</h3>
+          <span class="muted-text">Extrato</span>
+        </div>
+
+        <ul class="transaction-list" id="transaction-list">
+          <li class="transaction-item">
+            <div>
+              <strong>Salário</strong>
+              <small>25 mai 2026</small>
+            </div>
+            <span class="income">+ R$ 3.200,00</span>
+          </li>
+
+          <li class="transaction-item">
+            <div>
+              <strong>Mercado Bom Preço</strong>
+              <small>26 mai 2026</small>
+            </div>
+            <span class="expense">- R$ 86,40</span>
+          </li>
+
+          <li class="transaction-item">
+            <div>
+              <strong>Streaming</strong>
+              <small>27 mai 2026</small>
+            </div>
+            <span class="expense">- R$ 29,90</span>
+          </li>
+        </ul>
+      </section>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
