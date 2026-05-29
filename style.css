@@ -16,6 +16,21 @@
   --radius-sm: 12px;
 }
 
+body.dark-theme {
+  --bg: #020617;
+  --surface: #0f172a;
+  --surface-soft: #111827;
+  --primary: #60a5fa;
+  --primary-dark: #93c5fd;
+  --secondary: #1e3a8a;
+  --text: #f8fafc;
+  --muted: #cbd5e1;
+  --border: #334155;
+  --success: #34d399;
+  --danger: #f87171;
+  --shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -333,7 +348,7 @@ p {
 }
 
 .rate-card strong {
-  font-size: 1.2rem;
+  font-size: 0.8rem;
 }
 
 .rate-card small {
@@ -402,4 +417,127 @@ p {
   .rate-grid {
     grid-template-columns: repeat(3, 1fr);
   }
+}
+
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.action-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  border-radius: var(--radius-md);
+  padding: 16px 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 700;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.action-button span {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: var(--secondary);
+  color: var(--primary-dark);
+  font-size: 1.2rem;
+}
+
+.balance-card.negative {
+  background: linear-gradient(135deg, #dc2626, #991b1b);
+}
+
+.hidden-field {
+  display: none;
+}
+
+.hidden-field.visible {
+  display: block;
+}
+
+.rate-card small.income,
+.rate-card small.expense,
+.rate-card small.muted-text {
+  font-weight: 800;
+}
+
+.rate-card small.income {
+  color: var(--success);
+}
+
+.rate-card small.expense {
+  color: var(--danger);
+}
+
+.rate-card small.muted-text {
+  color: var(--muted);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+body.dark-theme {
+  background:
+    radial-gradient(circle at top left, #1e3a8a 0, transparent 35%),
+    var(--bg);
+}
+
+body.dark-theme .logo {
+  background: var(--primary);
+  color: #020617;
+}
+
+body.dark-theme .btn.primary {
+  color: #020617;
+}
+
+body.dark-theme .btn.secondary {
+  background: #172554;
+  color: #bfdbfe;
+}
+
+body.dark-theme .back-button,
+body.dark-theme .icon-button,
+body.dark-theme .action-button {
+  background: var(--surface);
+  color: var(--text);
+}
+
+body.dark-theme .form input {
+  background: #020617;
+  color: var(--text);
+  border-color: var(--border);
+}
+
+body.dark-theme .form input::placeholder {
+  color: #94a3b8;
+}
+
+body.dark-theme .rate-card,
+body.dark-theme .option-button {
+  background: #020617;
+}
+
+body.dark-theme .option-button.selected {
+  background: #1e3a8a;
+  color: #dbeafe;
+}
+
+body.dark-theme .balance-card {
+  background: linear-gradient(135deg, #1d4ed8, #1e3a8a);
+}
+
+body.dark-theme .balance-card.negative {
+  background: linear-gradient(135deg, #dc2626, #7f1d1d);
 }

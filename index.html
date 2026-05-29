@@ -145,22 +145,52 @@
 
     <!-- Tela principal / dashboard -->
     <section id="dashboard-screen" class="screen dashboard-screen">
-      <header class="dashboard-header">
-        <div>
-          <p class="eyebrow">Bem-vindo</p>
-          <h2 id="dashboard-user-name">Olá, usuário</h2>
-        </div>
+		<header class="dashboard-header">
+		  <div>
+			<p class="eyebrow">Bem-vindo</p>
+			<h2 id="dashboard-user-name">Olá, usuário</h2>
+		  </div>
 
-        <button class="icon-button" id="logout-button" title="Sair">
-          sair
-        </button>
-      </header>
+		  <div class="header-actions">
+			<button
+			  class="icon-button"
+			  id="theme-toggle-button"
+			  type="button"
+			  aria-label="Alternar modo noturno"
+			  aria-pressed="false"
+			  title="Alternar modo noturno"
+			>
+			  🌙
+			</button>
+
+			<button class="icon-button" id="logout-button" title="Sair">
+			  sair
+			</button>
+		  </div>
+		</header>
 
       <section class="balance-card">
         <p>Saldo disponível</p>
         <strong id="balance-value">R$ 2.840,75</strong>
         <small>Conta FlowBank • 0001</small>
       </section>
+
+	<section class="quick-actions">
+	  <button class="action-button" data-operation="deposit">
+		<span>＋</span>
+		Depositar
+	  </button>
+
+	  <button class="action-button" data-operation="withdraw">
+		<span>－</span>
+		Sacar
+	  </button>
+
+	  <button class="action-button" data-operation="transfer">
+		<span>⇄</span>
+		Transferir
+	  </button>
+	</section>
 
       <section class="content-section">
         <div class="section-title">
@@ -222,6 +252,41 @@
         </ul>
       </section>
     </section>
+
+	<!-- Tela de operação -->
+	<section id="operation-screen" class="screen">
+	  <header class="screen-header">
+		<button class="back-button" data-target="dashboard-screen">←</button>
+		<h2 id="operation-title">Operação</h2>
+	  </header>
+
+	  <form class="form" id="operation-form">
+		<div id="transfer-email-group" class="hidden-field">
+		  <label for="transfer-email">E-mail da conta de destino</label>
+		  <input
+			type="email"
+			id="transfer-email"
+			placeholder="destino@exemplo.com"
+		  />
+		</div>
+
+		<label for="operation-amount">Valor</label>
+		<input
+		  type="number"
+		  id="operation-amount"
+		  placeholder="0,00"
+		  min="0.01"
+		  step="0.01"
+		  required
+		/>
+
+		<p class="form-message" id="operation-message"></p>
+
+		<button class="btn primary" type="submit" id="operation-submit">
+		  Confirmar
+		</button>
+	  </form>
+	</section>
 
   </main>
 

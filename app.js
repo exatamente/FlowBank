@@ -18,14 +18,44 @@ const finishOnboardingButton = document.getElementById("finish-onboarding");
 const dashboardUserName = document.getElementById("dashboard-user-name");
 const logoutButton = document.getElementById("logout-button");
 const refreshRatesButton = document.getElementById("refresh-rates");
+const themeToggleButton = document.getElementById("theme-toggle-button");
+const exchangeRatesContainer = document.getElementById("exchange-rates");
 
 const balanceValue = document.getElementById("balance-value");
+const balanceCard = document.querySelector(".balance-card");
 const transactionList = document.getElementById("transaction-list");
+
+const actionButtons = document.querySelectorAll(".action-button");
+const operationForm = document.getElementById("operation-form");
+const operationTitle = document.getElementById("operation-title");
+const operationSubmit = document.getElementById("operation-submit");
+const operationAmount = document.getElementById("operation-amount");
+const operationMessage = document.getElementById("operation-message");
+
+const transferEmailGroup = document.getElementById("transfer-email-group");
+const transferEmailInput = document.getElementById("transfer-email");
 
 const USERS_STORAGE_KEY = "flowbank_users";
 const SESSION_STORAGE_KEY = "flowbank_session";
+const THEME_STORAGE_KEY = "flowbank_theme";
 
 let selectedGoal = "Organizar gastos";
+let currentOperation = null;
+
+const operationConfig = {
+  deposit: {
+    title: "Depositar",
+    submitText: "Confirmar depósito"
+  },
+  withdraw: {
+    title: "Sacar",
+    submitText: "Confirmar saque"
+  },
+  transfer: {
+    title: "Transferir",
+    submitText: "Confirmar transferência"
+  }
+};
 
 function showScreen(screenId) {
   screens.forEach((screen) => {
@@ -42,6 +72,10 @@ function showScreen(screenId) {
 function clearMessages() {
   loginMessage.textContent = "";
   registerMessage.textContent = "";
+
+  if (operationMessage) {
+    operationMessage.textContent = "";
+  }
 }
 
 function getUsers() {
@@ -90,11 +124,118 @@ function clearSession() {
   localStorage.removeItem(SESSION_STORAGE_KEY);
 }
 
+function getCurrentUser() {
+  const sessionEmail = getSession();
+
+  if (!sessionEmail) {
+    return null;
+  }
+
+  return findUserByEmail(sessionEmail);
+}
+
 function formatCurrency(value) {
   return value.toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL"
   });
+}
+
+function formatRateValue(value, currencyCode) {
+  const numberValue = Number(value);
+
+  if (currencyCode === "BTC") {
+    return numberValue.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      maximumFractionDigits: 0
+    });
+  }
+
+  return numberValue.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
+
+function getRateVariationClass(pctChange) {
+  const variation = Number(pctChange);
+
+  if (variation > 0) {
+    return "income";
+  }
+
+  if (variation < 0) {
+    return "expense";
+  }
+
+  return "muted-text";
+}
+
+function renderExchangeRates(rates) {
+  exchangeRatesContainer.innerHTML = rates.map((rate) => {
+    const variationClass = getRateVariationClass(rate.pctChange);
+    const formattedBid = formatRateValue(rate.bid, rate.code);
+
+    return `
+      <article class="rate-card">
+        <span>${rate.code}</span>
+        <strong>${formattedBid}</strong>
+        <small class="${variationClass}">
+          ${rate.pctChange}% hoje
+        </small>
+      </article>
+    `;
+  }).join("");
+}
+
+function renderRatesLoading() {
+  exchangeRatesContainer.innerHTML = `
+    <article class="rate-card">
+      <span>...</span>
+      <strong>Carregando</strong>
+      <small>Buscando cotações atualizadas</small>
+    </article>
+  `;
+}
+
+function renderRatesError() {
+  exchangeRatesContainer.innerHTML = `
+    <article class="rate-card">
+      <span>API</span>
+      <strong>Indisponível</strong>
+      <small>Não foi possível carregar as cotações agora.</small>
+    </article>
+  `;
+}
+
+async function loadExchangeRates() {
+  renderRatesLoading();
+
+  try {
+    const response = await fetch(
+      "https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL,BTC-BRL"
+    );
+
+    if (!response.ok) {
+      throw new Error("Erro ao consultar API de moedas.");
+    }
+
+    const data = await response.json();
+
+    const rates = [
+      data.USDBRL,
+      data.EURBRL,
+      data.BTCBRL
+    ];
+
+    renderExchangeRates(rates);
+  } catch (error) {
+    console.error(error);
+    renderRatesError();
+  }
 }
 
 function formatTransactionDate(dateString) {
@@ -107,27 +248,21 @@ function formatTransactionDate(dateString) {
   });
 }
 
+function getTodayDate() {
+  return new Date().toISOString().split("T")[0];
+}
+
+function createTransaction(description, amount, type) {
+  return {
+    description,
+    amount,
+    type,
+    date: getTodayDate()
+  };
+}
+
 function createDefaultTransactions() {
-  return [
-    {
-      description: "Salário",
-      amount: 3200,
-      type: "income",
-      date: "2026-05-25"
-    },
-    {
-      description: "Mercado Bom Preço",
-      amount: -86.4,
-      type: "expense",
-      date: "2026-05-26"
-    },
-    {
-      description: "Streaming",
-      amount: -29.9,
-      type: "expense",
-      date: "2026-05-27"
-    }
-  ];
+  return [];
 }
 
 function createDefaultUser(name, email, password) {
@@ -137,7 +272,7 @@ function createDefaultUser(name, email, password) {
     password,
     onboarded: false,
     goal: null,
-    balance: 2840.75,
+    balance: 0,
     transactions: createDefaultTransactions()
   };
 }
@@ -145,6 +280,12 @@ function createDefaultUser(name, email, password) {
 function updateDashboard(user) {
   dashboardUserName.textContent = `Olá, ${user.name}`;
   balanceValue.textContent = formatCurrency(user.balance);
+
+  if (user.balance < 0) {
+    balanceCard.classList.add("negative");
+  } else {
+    balanceCard.classList.remove("negative");
+  }
 
   transactionList.innerHTML = "";
 
@@ -190,6 +331,7 @@ function handleAuthenticatedUser(user) {
 
   if (user.onboarded) {
     showScreen("dashboard-screen");
+    loadExchangeRates();
   } else {
     showScreen("onboarding-screen");
   }
@@ -231,14 +373,7 @@ function registerUser(name, email, password) {
 }
 
 function finishOnboarding() {
-  const sessionEmail = getSession();
-
-  if (!sessionEmail) {
-    showScreen("welcome-screen");
-    return;
-  }
-
-  const user = findUserByEmail(sessionEmail);
+  const user = getCurrentUser();
 
   if (!user) {
     clearSession();
@@ -265,14 +400,7 @@ function logoutUser() {
 }
 
 function restoreSession() {
-  const sessionEmail = getSession();
-
-  if (!sessionEmail) {
-    showScreen("welcome-screen");
-    return;
-  }
-
-  const user = findUserByEmail(sessionEmail);
+  const user = getCurrentUser();
 
   if (!user) {
     clearSession();
@@ -281,6 +409,213 @@ function restoreSession() {
   }
 
   handleAuthenticatedUser(user);
+}
+
+function openOperationScreen(operation) {
+  currentOperation = operation;
+
+  const config = operationConfig[operation];
+
+  operationTitle.textContent = config.title;
+  operationSubmit.textContent = config.submitText;
+
+  operationForm.reset();
+  operationMessage.textContent = "";
+
+  if (operation === "transfer") {
+    transferEmailGroup.classList.add("visible");
+    transferEmailInput.setAttribute("required", "required");
+  } else {
+    transferEmailGroup.classList.remove("visible");
+    transferEmailInput.removeAttribute("required");
+  }
+
+  showScreen("operation-screen");
+}
+
+function getOperationAmount() {
+  const amount = Number(operationAmount.value);
+
+  if (!amount || amount <= 0) {
+    operationMessage.textContent = "Informe um valor maior que zero.";
+    return null;
+  }
+
+  return amount;
+}
+
+function handleDeposit() {
+  const amount = getOperationAmount();
+
+  if (!amount) {
+    return;
+  }
+
+  const user = getCurrentUser();
+
+  if (!user) {
+    clearSession();
+    showScreen("welcome-screen");
+    return;
+  }
+
+  user.balance += amount;
+
+  user.transactions.unshift(
+    createTransaction("Depósito", amount, "income")
+  );
+
+  updateUser(user);
+  updateDashboard(user);
+
+  operationForm.reset();
+  showScreen("dashboard-screen");
+}
+
+function handleWithdraw() {
+  const amount = getOperationAmount();
+
+  if (!amount) {
+    return;
+  }
+
+  const user = getCurrentUser();
+
+  if (!user) {
+    clearSession();
+    showScreen("welcome-screen");
+    return;
+  }
+
+  user.balance -= amount;
+
+  user.transactions.unshift(
+    createTransaction("Saque", -amount, "expense")
+  );
+
+  updateUser(user);
+  updateDashboard(user);
+
+  operationForm.reset();
+  showScreen("dashboard-screen");
+}
+
+function handleTransfer() {
+  const amount = getOperationAmount();
+
+  if (!amount) {
+    return;
+  }
+
+  const sender = getCurrentUser();
+
+  if (!sender) {
+    clearSession();
+    showScreen("welcome-screen");
+    return;
+  }
+
+  const receiverEmail = transferEmailInput.value.trim();
+
+  if (!receiverEmail) {
+    operationMessage.textContent = "Informe o e-mail da conta de destino.";
+    return;
+  }
+
+  if (receiverEmail === sender.email) {
+    operationMessage.textContent = "Não é possível transferir para a própria conta.";
+    return;
+  }
+
+  const users = getUsers();
+  const receiver = users.find((user) => user.email === receiverEmail);
+
+  if (!receiver) {
+    operationMessage.textContent = "Conta de destino não encontrada.";
+    return;
+  }
+
+  const updatedUsers = users.map((user) => {
+    if (user.email === sender.email) {
+      return {
+        ...user,
+        balance: user.balance - amount,
+        transactions: [
+          createTransaction(`Transferência enviada para ${receiver.email}`, -amount, "expense"),
+          ...user.transactions
+        ]
+      };
+    }
+
+    if (user.email === receiver.email) {
+      return {
+        ...user,
+        balance: user.balance + amount,
+        transactions: [
+          createTransaction(`Transferência recebida de ${sender.email}`, amount, "income"),
+          ...user.transactions
+        ]
+      };
+    }
+
+    return user;
+  });
+
+  saveUsers(updatedUsers);
+
+  const updatedSender = updatedUsers.find((user) => user.email === sender.email);
+
+  updateDashboard(updatedSender);
+
+  operationForm.reset();
+  showScreen("dashboard-screen");
+}
+
+function handleOperationSubmit(event) {
+  event.preventDefault();
+
+  if (currentOperation === "deposit") {
+    handleDeposit();
+    return;
+  }
+
+  if (currentOperation === "withdraw") {
+    handleWithdraw();
+    return;
+  }
+
+  if (currentOperation === "transfer") {
+    handleTransfer();
+  }
+}
+
+function applyTheme(theme) {
+  if (theme === "dark") {
+    document.body.classList.add("dark-theme");
+    themeToggleButton.textContent = "☀️";
+    themeToggleButton.setAttribute("aria-pressed", "true");
+    themeToggleButton.setAttribute("title", "Alternar para modo claro");
+    themeToggleButton.setAttribute("aria-label", "Alternar para modo claro");
+    return;
+  }
+
+  document.body.classList.remove("dark-theme");
+  themeToggleButton.textContent = "🌙";
+  themeToggleButton.setAttribute("aria-pressed", "false");
+  themeToggleButton.setAttribute("title", "Alternar para modo noturno");
+  themeToggleButton.setAttribute("aria-label", "Alternar para modo noturno");
+}
+
+function getSavedTheme() {
+  return localStorage.getItem(THEME_STORAGE_KEY) || "light";
+}
+
+function toggleTheme() {
+  const isDarkTheme = document.body.classList.contains("dark-theme");
+  const newTheme = isDarkTheme ? "light" : "dark";
+
+  localStorage.setItem(THEME_STORAGE_KEY, newTheme);
+  applyTheme(newTheme);
 }
 
 goToLoginButton.addEventListener("click", () => {
@@ -365,6 +700,12 @@ optionButtons.forEach((button) => {
   });
 });
 
+actionButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    openOperationScreen(button.dataset.operation);
+  });
+});
+
 finishOnboardingButton.addEventListener("click", () => {
   finishOnboarding();
 });
@@ -373,8 +714,15 @@ logoutButton.addEventListener("click", () => {
   logoutUser();
 });
 
+operationForm.addEventListener("submit", handleOperationSubmit);
+
 refreshRatesButton.addEventListener("click", () => {
-  console.log("Aqui entraremos depois com a chamada da API de cotações.");
+  loadExchangeRates();
 });
 
+themeToggleButton.addEventListener("click", () => {
+  toggleTheme();
+});
+
+applyTheme(getSavedTheme());
 restoreSession();
