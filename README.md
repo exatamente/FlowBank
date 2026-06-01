@@ -4,7 +4,7 @@ UC Usabilidade, Desenvolvimento Web e Jogos
 Caio Augusto dos Santos
 RA 312420644
 
-Edgar Gomes
+Edgar Gomes Silva
 RA 312520560
 
 Eduardo dos Santos Mendonça
