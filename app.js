@@ -29,6 +29,7 @@ const nextRateButton = document.getElementById("next-rate");
 const rateIndicators = document.getElementById("rate-indicators");
 
 const balanceValue = document.getElementById("balance-value");
+const accountNumber = document.getElementById("account-number");
 const balanceCard = document.querySelector(".balance-card");
 const transactionList = document.getElementById("transaction-list");
 
@@ -156,6 +157,25 @@ function formatCurrency(value) {
     style: "currency",
     currency: "BRL"
   });
+}
+
+/* gera numero unico de conta a partir do e-mail*/
+function generateAccountNumber(email) {
+  let hash = 0;
+
+  const normalizedEmail = email.trim().toLowerCase();
+
+  for (let i = 0; i < normalizedEmail.length; i++) {
+    hash = (hash * 31 + normalizedEmail.charCodeAt(i)) >>> 0;
+  }
+
+  const accountBase = String(hash).padStart(10, "0").slice(-10);
+
+  const agency = accountBase.slice(0, 4);
+  const account = accountBase.slice(4, 9);
+  const digit = accountBase.slice(9);
+
+  return `${agency}.${account}-${digit}`;
 }
 
 function formatRateValue(value, currencyCode) {
@@ -380,6 +400,7 @@ function createDefaultUser(name, email, password) {
 function updateDashboard(user) {
   dashboardUserName.textContent = `Olá, ${user.name}`;
   balanceValue.textContent = formatCurrency(user.balance);
+  accountNumber.textContent = `Conta FlowBank • ${generateAccountNumber(user.email)}`;
 
   if (user.balance < 0) {
     balanceCard.classList.add("negative");
