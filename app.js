@@ -1,3 +1,6 @@
+
+/* app.jp */
+
 const screens = document.querySelectorAll(".screen");
 
 const goToLoginButton = document.getElementById("go-to-login");
@@ -21,6 +24,10 @@ const refreshRatesButton = document.getElementById("refresh-rates");
 const themeToggleButton = document.getElementById("theme-toggle-button");
 const exchangeRatesContainer = document.getElementById("exchange-rates");
 
+const previousRateButton = document.getElementById("previous-rate");
+const nextRateButton = document.getElementById("next-rate");
+const rateIndicators = document.getElementById("rate-indicators");
+
 const balanceValue = document.getElementById("balance-value");
 const balanceCard = document.querySelector(".balance-card");
 const transactionList = document.getElementById("transaction-list");
@@ -41,6 +48,12 @@ const THEME_STORAGE_KEY = "flowbank_theme";
 
 let selectedGoal = "Organizar gastos";
 let currentOperation = null;
+
+let exchangeRates = [];
+let currentRateIndex = 0;
+let rateCarouselInterval = null;
+
+/* operações e movimetações */
 
 const operationConfig = {
   deposit: {
@@ -112,6 +125,8 @@ function updateUser(updatedUser) {
   saveUsers(updatedUsers);
 }
 
+/* manutenaçõ da sessão com LocalStorage */
+
 function saveSession(email) {
   localStorage.setItem(SESSION_STORAGE_KEY, email);
 }
@@ -134,6 +149,8 @@ function getCurrentUser() {
   return findUserByEmail(sessionEmail);
 }
 
+/* funções auxiliares */
+
 function formatCurrency(value) {
   return value.toLocaleString("pt-BR", {
     style: "currency",
@@ -144,11 +161,14 @@ function formatCurrency(value) {
 function formatRateValue(value, currencyCode) {
   const numberValue = Number(value);
 
-  if (currencyCode === "BTC") {
+  const currenciesWithFourDecimals = ["ARS", "JPY"];
+
+  if (currenciesWithFourDecimals.includes(currencyCode)) {
     return numberValue.toLocaleString("pt-BR", {
       style: "currency",
       currency: "BRL",
-      maximumFractionDigits: 0
+      minimumFractionDigits: 4,
+      maximumFractionDigits: 4
     });
   }
 
@@ -175,23 +195,86 @@ function getRateVariationClass(pctChange) {
 }
 
 function renderExchangeRates(rates) {
-  exchangeRatesContainer.innerHTML = rates.map((rate) => {
-    const variationClass = getRateVariationClass(rate.pctChange);
-    const formattedBid = formatRateValue(rate.bid, rate.code);
+  exchangeRates = rates;
+  currentRateIndex = 0;
 
-    return `
-      <article class="rate-card">
-        <span>${rate.code}</span>
-        <strong>${formattedBid}</strong>
-        <small class="${variationClass}">
-          ${rate.pctChange}% hoje
-        </small>
-      </article>
-    `;
+  renderCurrentRate();
+  startRateCarousel();
+}
+
+/* geração dos modelos de cards */
+
+function renderCurrentRate() {
+  if (!exchangeRates.length) {
+    return;
+  }
+
+  const rate = exchangeRates[currentRateIndex];
+  const variationClass = getRateVariationClass(rate.pctChange);
+  const formattedBid = formatRateValue(rate.bid, rate.code);
+
+  exchangeRatesContainer.innerHTML = `
+    <article class="rate-card" aria-live="polite">
+      <span>${rate.code}</span>
+      <strong>${formattedBid}</strong>
+      <small>${rate.name}</small>
+      <small class="${variationClass}">
+        ${rate.pctChange}% hoje
+      </small>
+    </article>
+  `;
+
+  renderRateIndicators();
+}
+
+function renderRateIndicators() {
+  rateIndicators.innerHTML = exchangeRates.map((_, index) => {
+    const activeClass = index === currentRateIndex ? "active" : "";
+
+    return `<span class="carousel-dot ${activeClass}"></span>`;
   }).join("");
 }
 
+function showNextRate() {
+  if (!exchangeRates.length) {
+    return;
+  }
+
+  currentRateIndex = (currentRateIndex + 1) % exchangeRates.length;
+  renderCurrentRate();
+}
+
+function showPreviousRate() {
+  if (!exchangeRates.length) {
+    return;
+  }
+
+  currentRateIndex =
+    (currentRateIndex - 1 + exchangeRates.length) % exchangeRates.length;
+
+  renderCurrentRate();
+}
+
+/* geração da estrututra carrosel e cards */
+
+function startRateCarousel() {
+  stopRateCarousel();
+
+  rateCarouselInterval = setInterval(() => {
+    showNextRate();
+  }, 10000);
+}
+
+function stopRateCarousel() {
+  if (rateCarouselInterval) {
+    clearInterval(rateCarouselInterval);
+    rateCarouselInterval = null;
+  }
+}
+
 function renderRatesLoading() {
+  stopRateCarousel();
+
   exchangeRatesContainer.innerHTML = `
     <article class="rate-card">
       <span>...</span>
@@ -199,9 +282,15 @@ function renderRatesLoading() {
       <small>Buscando cotações atualizadas</small>
     </article>
   `;
+
+  rateIndicators.innerHTML = "";
 }
 
+/* erro para exibição */
+
 function renderRatesError() {
+  stopRateCarousel();
+
   exchangeRatesContainer.innerHTML = `
     <article class="rate-card">
       <span>API</span>
@@ -209,15 +298,19 @@ function renderRatesError() {
       <small>Não foi possível carregar as cotações agora.</small>
     </article>
   `;
+
+  rateIndicators.innerHTML = "";
 }
+
+/* chamadas para a AwesomeAPI e funções de formatação */
 
 async function loadExchangeRates() {
   renderRatesLoading();
 
   try {
-    const response = await fetch(
-      "https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL,BTC-BRL"
-    );
+		const response = await fetch(
+		  "https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL,GBP-BRL,ARS-BRL,JPY-BRL,CAD-BRL,CNY-BRL,BTC-BRL"
+		);
 
     if (!response.ok) {
       throw new Error("Erro ao consultar API de moedas.");
@@ -225,11 +318,16 @@ async function loadExchangeRates() {
 
     const data = await response.json();
 
-    const rates = [
-      data.USDBRL,
-      data.EURBRL,
-      data.BTCBRL
-    ];
+	const rates = [
+	  data.USDBRL,
+	  data.EURBRL,
+	  data.GBPBRL,
+	  data.ARSBRL,
+	  data.JPYBRL,
+	  data.CADBRL,
+	  data.CNYBRL,
+	  data.BTCBRL
+	].filter(Boolean);
 
     renderExchangeRates(rates);
   } catch (error) {
@@ -276,6 +374,8 @@ function createDefaultUser(name, email, password) {
     transactions: createDefaultTransactions()
   };
 }
+
+/* principal dashboard */
 
 function updateDashboard(user) {
   dashboardUserName.textContent = `Olá, ${user.name}`;
@@ -325,6 +425,8 @@ function updateDashboard(user) {
     transactionList.appendChild(transactionItem);
   });
 }
+
+/* gerenciamento de login */
 
 function handleAuthenticatedUser(user) {
   updateDashboard(user);
@@ -410,6 +512,8 @@ function restoreSession() {
 
   handleAuthenticatedUser(user);
 }
+
+/* operações internas da dashboard*/
 
 function openOperationScreen(operation) {
   currentOperation = operation;
@@ -589,6 +693,8 @@ function handleOperationSubmit(event) {
   }
 }
 
+/* dark mode */
+
 function applyTheme(theme) {
   if (theme === "dark") {
     document.body.classList.add("dark-theme");
@@ -617,6 +723,8 @@ function toggleTheme() {
   localStorage.setItem(THEME_STORAGE_KEY, newTheme);
   applyTheme(newTheme);
 }
+
+/* eventos */
 
 goToLoginButton.addEventListener("click", () => {
   clearMessages();
@@ -722,6 +830,16 @@ refreshRatesButton.addEventListener("click", () => {
 
 themeToggleButton.addEventListener("click", () => {
   toggleTheme();
+});
+
+nextRateButton.addEventListener("click", () => {
+  showNextRate();
+  startRateCarousel();
+});
+
+previousRateButton.addEventListener("click", () => {
+  showPreviousRate();
+  startRateCarousel();
 });
 
 applyTheme(getSavedTheme());

@@ -541,3 +541,124 @@ body.dark-theme .balance-card {
 body.dark-theme .balance-card.negative {
   background: linear-gradient(135deg, #dc2626, #7f1d1d);
 }
+
+.rate-carousel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rate-carousel-card {
+  overflow: hidden;
+}
+
+.rate-carousel-card .rate-card {
+  min-height: 132px;
+  animation: slideFadeIn 0.35s ease;
+}
+
+.rate-card {
+  min-width: 0;
+}
+
+.rate-card strong {
+  font-size: 1.15rem;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.carousel-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.carousel-button {
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--secondary);
+  color: var(--primary-dark);
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+
+.carousel-indicators {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 6px;
+}
+
+.carousel-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--border);
+}
+
+.carousel-dot.active {
+  width: 18px;
+  background: var(--primary);
+}
+
+body.dark-theme .carousel-button {
+  background: #172554;
+  color: #bfdbfe;
+}
+
+@keyframes slideFadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.rate-carousel-card .rate-card {
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  color: #ffffff;
+  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.25);
+}
+
+.rate-carousel-card .rate-card span,
+.rate-carousel-card .rate-card small {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.rate-carousel-card .rate-card strong {
+  color: #ffffff;
+}
+
+.rate-carousel-card .rate-card small.income {
+  color: #bbf7d0;
+}
+
+.rate-carousel-card .rate-card small.expense {
+  color: #fecaca;
+}
+
+.rate-carousel-card .rate-card small.muted-text {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+body.dark-theme .rate-carousel-card .rate-card {
+  background: linear-gradient(135deg, #1d4ed8, #1e3a8a);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+}
+
+body.dark-theme .rate-carousel-card .rate-card span,
+body.dark-theme .rate-carousel-card .rate-card small {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+body.dark-theme .rate-carousel-card .rate-card strong {
+  color: #ffffff;
+}

@@ -198,25 +198,45 @@
           <button class="text-button" id="refresh-rates">Atualizar</button>
         </div>
 
-        <div class="rate-grid" id="exchange-rates">
-          <article class="rate-card">
-            <span>USD</span>
-            <strong>R$ 5,00</strong>
-            <small>Dólar comercial</small>
-          </article>
+		<div
+		  class="rate-carousel"
+		  aria-label="Cotações de moedas"
+		>
+		  <div id="exchange-rates" class="rate-carousel-card">
+			<article class="rate-card">
+			  <span>USD</span>
+			  <strong>Carregando...</strong>
+			  <small>Cotações atualizadas</small>
+			</article>
+		  </div>
 
-          <article class="rate-card">
-            <span>EUR</span>
-            <strong>R$ 5,40</strong>
-            <small>Euro comercial</small>
-          </article>
+		  <div class="carousel-controls">
+			<button
+			  class="carousel-button"
+			  id="previous-rate"
+			  type="button"
+			  aria-label="Cotação anterior"
+			>
+			  ←
+			</button>
 
-          <article class="rate-card">
-            <span>BTC</span>
-            <strong>R$ 300.000,00</strong>
-            <small>Bitcoin</small>
-          </article>
-        </div>
+			<div
+			  class="carousel-indicators"
+			  id="rate-indicators"
+			  aria-hidden="true"
+			></div>
+
+			<button
+			  class="carousel-button"
+			  id="next-rate"
+			  type="button"
+			  aria-label="Próxima cotação"
+			>
+			  →
+			</button>
+		  </div>
+		</div>
+		
       </section>
 
       <section class="content-section">
@@ -236,7 +256,7 @@
 
           <li class="transaction-item">
             <div>
-              <strong>Mercado Bom Preço</strong>
+              <strong>MercadoLivre</strong>
               <small>26 mai 2026</small>
             </div>
             <span class="expense">- R$ 86,40</span>
@@ -244,7 +264,7 @@
 
           <li class="transaction-item">
             <div>
-              <strong>Streaming</strong>
+              <strong>Netflix</strong>
               <small>27 mai 2026</small>
             </div>
             <span class="expense">- R$ 29,90</span>
