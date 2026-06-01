@@ -1,2 +1,11 @@
 Grupo 5 - 
 UC Usabilidade, Desenvolvimento Web e Jogos
+
+Caio Augusto dos Santos
+RA 312420644
+
+Edgar Gomes
+RA 312520560
+
+Eduardo dos Santos Mendonça
+RA 312520724
