@@ -1,6 +1,8 @@
 
 /* app.jp */
 
+/* Seletores */
+
 const screens = document.querySelectorAll(".screen");
 
 const goToLoginButton = document.getElementById("go-to-login");
@@ -126,7 +128,7 @@ function updateUser(updatedUser) {
   saveUsers(updatedUsers);
 }
 
-/* manutenaçõ da sessão com LocalStorage */
+/* operaç~oes da sessão com LocalStorage */
 
 function saveSession(email) {
   localStorage.setItem(SESSION_STORAGE_KEY, email);
@@ -447,7 +449,7 @@ function updateDashboard(user) {
   });
 }
 
-/* gerenciamento de login */
+/* gerenciamento de login autenticação */
 
 function handleAuthenticatedUser(user) {
   updateDashboard(user);
@@ -862,6 +864,8 @@ previousRateButton.addEventListener("click", () => {
   showPreviousRate();
   startRateCarousel();
 });
+
+/* Inicialização */
 
 applyTheme(getSavedTheme());
 restoreSession();
